@@ -70,19 +70,26 @@ void	ft_signal_receiver(int sig)
 void	ft_send_bits(int pid, char byte)
 {
 	int	count;
-	//int	bit;
 
 	count = 0;
 	while (count < 8)
 	{
-		//bit = (byte >> count) & 1;
-		if (byte & (0x80 >> count))
+		if (byte & 0x80)
+			kill(pid, SIGUSR1);
+		else
+			kill(pid, SIGUSR2);
+		byte <<= 1;
+		count++;
+		usleep(500);
+		//if (byte & (0x80 >> count))
+		/* if ((byte >> count) & 1)
 			if (kill(pid, SIGUSR1) == -1)
 				exit(1);
-		else if (kill(pid, SIGUSR2) == -1)
+		else
+			if (kill(pid, SIGUSR2) == -1)
 				exit(1);
-		usleep(100);
 		count++;
+		usleep(100); */
 	}
 }
 
@@ -91,26 +98,22 @@ void	ft_send_str(char *str, int pid)
 	int	i;
 
 	i = -1;
-	while (str[++i])
+	while (str[++i] != '\0')
 		ft_send_bits(pid, str[i]);
 	ft_send_bits(pid, '\0');
 }
 
 int	main(int argc, char *argv[])
 {
-	//int	i;
 	int	pid;
 
+	if (argc != 3)
+	{
+		ft_putstr("Invalid number of arguments\n");
+		exit(1);
+	}
 	signal(SIGUSR1, ft_signal_receiver);
 	signal(SIGUSR2, ft_signal_receiver);
 	pid = ft_atoi(argv[1]);
 	ft_send_str(argv[2], pid);
-	/* i = 0;
-	while (argv[2][i] != '\0')
-	{
-		ft_send(pid, argv[2][i]);
-		i++;
-	}
-	ft_send(pid, '\0'); */
-	return (0);
 }

@@ -15,6 +15,11 @@
 #include <unistd.h>
 #include <stdio.h>
 
+void	ft_putchar_fd(char c, int fd)
+{
+	write(fd, &c, 1);
+}
+
 void	ft_putstr(char *s)
 {
 	if (s == NULL)
@@ -51,32 +56,30 @@ void	ft_putnbr(int n)
 	}
 }
 
-void	ft_handler(int	sig, siginfo_t *info, void *ucontext)
+void	ft_handler(int sig, siginfo_t *info, void *ucontext)
 {
-	static char	c = 0xFF;
-	static int	bit = 0;
-	static int	client_pid = 0;
+	static char	c;
+	static int	bit;
+	static int	client_pid;
 
 	(void)ucontext;
-	if ((info)->si_pid)
+	if (info->si_pid)
 		client_pid = info->si_pid;
 	if (sig == SIGUSR1)
-		c |= 0x80 >> bit;
-	else if (sig == SIGUSR2)
-		c ^= 0x80 >> bit;
+		c |= (0x80 >> bit);
 	bit++;
 	if (bit == 8)
 	{
-		if (!c)
+		if (c == '\0')
 		{
-			write(1, &c, 1);
+			ft_putchar_fd(c, 1);
 			if (kill(client_pid, SIGUSR2) == -1)
 				exit(1);
 		}
 		else
-			write(1, &c, 1);
+			ft_putchar_fd(c, 1);
 		bit = 0;
-		c = 0xFF;
+		c = 0;
 	}
 	if (kill(client_pid, SIGUSR1) == -1)
 		exit(1);
@@ -94,7 +97,7 @@ int	main(void)
 	pid = getpid();
 	ft_putstr("PID : ");
 	ft_putnbr(pid);
-	write(1, "\n", 1);
+	ft_putchar_fd('\n', 1);
 	while (1)
 		pause();
 	return (0);
