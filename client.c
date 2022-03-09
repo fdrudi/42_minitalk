@@ -10,45 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <signal.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
-
-void	ft_putstr(char *s)
-{
-	if (s == NULL)
-		return ;
-	while (*s != '\0')
-	{
-		write(1, &*s, 1);
-		s++;
-	}
-}
-
-int	ft_atoi(const char *str)
-{
-	int	x;
-	int	y;
-
-	y = 0;
-	x = 1;
-	while (*str == 32 || (*str >= 9 && *str <= 13))
-		str++;
-	if (*str == 43 || *str == 45)
-	{
-		if (*str == 45)
-			x *= -1;
-		str++;
-	}
-	while (*str <= 57 && *str >= 48)
-	{
-		y = (y * 10) + ((*str - 48) % 10);
-		str++;
-	}
-	y *= x;
-	return (y);
-}
+#include "minitalk.h"
 
 void	ft_signal_receiver(int sig)
 {
@@ -56,12 +18,12 @@ void	ft_signal_receiver(int sig)
 
 	if (sig == SIGUSR1 && i == 0)
 	{
-		ft_putstr("\nMessage delivered ");
+		ft_putstr_fd("\nMessage delivered ", 1);
 		i = 1;
 	}
 	if (sig == SIGUSR2)
 	{
-		ft_putstr("---> Messagge arrived\n");
+		ft_putstr_fd("---> Messagge arrived\n", 1);
 		i = 0;
 		exit(0);
 	}
@@ -81,15 +43,6 @@ void	ft_send_bits(int pid, char byte)
 		byte <<= 1;
 		count++;
 		usleep(500);
-		//if (byte & (0x80 >> count))
-		/* if ((byte >> count) & 1)
-			if (kill(pid, SIGUSR1) == -1)
-				exit(1);
-		else
-			if (kill(pid, SIGUSR2) == -1)
-				exit(1);
-		count++;
-		usleep(100); */
 	}
 }
 
@@ -100,6 +53,7 @@ void	ft_send_str(char *str, int pid)
 	i = -1;
 	while (str[++i] != '\0')
 		ft_send_bits(pid, str[i]);
+	ft_send_bits(pid, '\n');
 	ft_send_bits(pid, '\0');
 }
 
@@ -109,7 +63,7 @@ int	main(int argc, char *argv[])
 
 	if (argc != 3)
 	{
-		ft_putstr("Invalid number of arguments\n");
+		ft_putstr_fd("Invalid number of arguments\n", 1);
 		exit(1);
 	}
 	signal(SIGUSR1, ft_signal_receiver);

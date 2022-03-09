@@ -10,51 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <signal.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
-
-void	ft_putchar_fd(char c, int fd)
-{
-	write(fd, &c, 1);
-}
-
-void	ft_putstr(char *s)
-{
-	if (s == NULL)
-		return ;
-	while (*s != '\0')
-	{
-		write(1, &*s, 1);
-		s++;
-	}
-}
-
-void	ft_putnbr(int n)
-{
-	if (n == -2147483648)
-	{
-		write(1, "-", 1);
-		write(1, "2", 1);
-		n = 147483648;
-	}
-	if (n < 0)
-	{
-		write(1, "-", 1);
-		n *= -1;
-	}
-	if (n >= 10)
-	{
-		ft_putnbr(n / 10);
-		ft_putnbr(n % 10);
-	}
-	else
-	{
-		n = n + 48;
-		write(1, &n, 1);
-	}
-}
+#include "minitalk.h"
 
 void	ft_handler(int sig, siginfo_t *info, void *ucontext)
 {
@@ -95,8 +51,8 @@ int	main(void)
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
 	pid = getpid();
-	ft_putstr("PID : ");
-	ft_putnbr(pid);
+	ft_putstr_fd("PID : ", 1);
+	ft_putnbr_fd(pid, 1);
 	ft_putchar_fd('\n', 1);
 	while (1)
 		pause();
