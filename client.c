@@ -18,12 +18,12 @@ void	ft_signal_receiver(int sig)
 
 	if (sig == SIGUSR1 && i == 0)
 	{
-		ft_putstr_fd("\nMessage delivered ", 1);
+		ft_putstr_fd("\n| Message delivered | ", 1);
 		i = 1;
 	}
 	if (sig == SIGUSR2)
 	{
-		ft_putstr_fd("---> Messagge arrived\n", 1);
+		ft_putstr_fd("---> | Messagge arrived |\n", 1);
 		i = 0;
 		exit(0);
 	}
